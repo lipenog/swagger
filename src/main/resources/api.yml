@@ -1,0 +1,280 @@
+openapi: '3.0.3'
+info:
+  version: '1.0.0'
+  title: Swagger Guide
+  description: A simple project based on swagger and spring boot
+servers:
+  - url: localhost:8080
+paths:
+  /members:
+    get:
+      operationId: getAllMembers
+      parameters:
+        - in: query
+          name: limit
+          required: false
+          schema:
+            type: integer
+            format: long
+      summary: 'Get all members'
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MemberDTO'
+    post:
+      summary: 'Create a new member'
+      operationId: createMember
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MemberDTO'
+        required: true
+      responses:
+        200:
+          description: ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MemberDTO'
+        400:
+          description: Invalid input
+
+
+  /members/{member_id}:
+    parameters:
+      - in: path
+        name: member_id
+        required: true
+        schema:
+          type: string
+    get:
+      operationId: getMemberByID
+      summary: 'Get a single member based on the id'
+      responses:
+        200:
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MemberDTO'
+    put:
+      operationId: updateMember
+      summary: 'Updates a single Member'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MemberDTO'
+        required: true
+      responses:
+        200:
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MemberDTO'
+    delete:
+      operationId: deleteMember
+      summary: 'Delete a single member'
+      responses:
+        '400':
+          description: Invalid username supplied
+        '404':
+          description: User not found
+
+  /members/{member_id}/tasks:
+    parameters:
+      - in: path
+        name: member_id
+        required: true
+        schema:
+          type: string
+      - in: query
+        name: limit
+        required: false
+        schema:
+          type: integer
+          format: long
+    get:
+      operationId: getMemberTasks
+      summary: 'Get all tasks assigned to a member'
+      responses:
+        200:
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TaskDTO'
+  /tasks:
+    get:
+      operationId: getAllTasks
+      parameters:
+        - in: query
+          name: limit
+          required: false
+          schema:
+            type: integer
+            format: long
+      summary: 'Get all tasks'
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TaskDTO'
+    post:
+      operationId: createTask
+      summary: 'Create a new task'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TaskDTO'
+        required: true
+      responses:
+        200:
+          description: ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskDTO'
+        405:
+          description: Invalid input
+
+  /tasks/{task_id}:
+    parameters:
+      - in: path
+        name: task_id
+        required: true
+        schema:
+          type: string
+    get:
+      operationId: getTaskByID
+      summary: 'Get a single task based on the id'
+      responses:
+        200:
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskDTO'
+    put:
+      operationId: updateTask
+      summary: 'Updates a single task'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TaskDTO'
+        required: true
+      responses:
+        200:
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskDTO'
+    delete:
+      operationId: deleteTask
+      summary: 'Delete a single member'
+      responses:
+        '400':
+          description: Invalid username supplied
+        '404':
+          description: User not found
+
+  /tasks/{task_id}/assign:
+    parameters:
+      - in: path
+        name: task_id
+        required: true
+        schema:
+          type: integer
+          format: long
+  /tasks/{task_id}/unassign:
+    parameters:
+      - in: path
+        name: task_id
+        required: true
+        schema:
+          type: integer
+          format: long
+  /tasks/{task_id}/finish:
+    parameters:
+      - in: path
+        name: task_id
+        required: true
+        schema:
+          type: integer
+          format: long
+
+components:
+  schemas:
+    MemberDTO:
+      type: object
+      required:
+        - id
+        - firstName
+        - lastName
+        - email
+        - role
+      properties:
+        id:
+          type: string
+          example: lipenog
+        firstName:
+          type: string
+          example: Luis
+        lastName:
+          type: string
+          example: Felipe
+        email:
+          type: string
+          example: test@gmail.com
+        role:
+          $ref: '#/components/schemas/MemberRoles'
+
+    MemberRoles:
+      type: string
+      enum: [employee, manager, admin]
+
+    TaskDTO:
+      type: object
+      required:
+        - id
+        - name
+        - description
+        - status
+        - createdBy
+      properties:
+        id:
+          type: integer
+          format: long
+          example: 123
+        name:
+          type: string
+          example: task01
+        description:
+          type: string
+          example: Do this task
+        status:
+          $ref: '#/components/schemas/TaskStatus'
+        createdBy:
+          $ref: '#/components/schemas/MemberDTO'
+        workingOn:
+          $ref: '#/components/schemas/MemberDTO'
+
+    TaskStatus:
+      type: string
+      enum: [completed, in progress, waiting]
